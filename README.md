@@ -1,3 +1,5 @@
+[![CI](https://github.com/DocPlanner/GoogleBundle/actions/workflows/tests.yml/badge.svg)](https://github.com/DocPlanner/GoogleBundle/actions/workflows/tests.yml)
+
 # GoogleBundle
 
 The GoogleBundle adds the ability to add various google-related services
