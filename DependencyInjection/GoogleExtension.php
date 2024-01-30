@@ -4,7 +4,6 @@ namespace AntiMattr\GoogleBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
@@ -15,55 +14,43 @@ class GoogleExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $modules = array(
-            'adwords' => array(),
-            'analytics' => array(),
-            'maps' => array(),
-        );
+        $configuration = new Configuration;
+        $config        = $this->processConfiguration($configuration, $configs);
+
+        $modules = [
+            'analytics' => [],
+            'maps'      => [],
+        ];
 
         foreach ($configs as $config) {
             foreach (array_keys($modules) as $module) {
                 if (array_key_exists($module, $config)) {
-                    $modules[$module][] = isset($config[$module]) ? $config[$module] : array();
+                    $modules[$module][] = isset($config[$module]) ? $config[$module] : [];
                 }
             }
         }
 
-        foreach (array_keys($modules) as $module) {
-            if (!empty($modules[$module])) {
-                call_user_func(array($this, $module . 'Load'), $modules[$module], $container);
-            }
-        }
+        $this->adwordsLoad($config['adwords'], $container);
+        $this->analyticsLoad($modules['analytics'], $container);
+        $this->mapsLoad($modules['maps'], $container);
     }
 
-    /**
-     * @param array            $configs
-     * @param ContainerBuilder $container
-     */
-    private function adwordsLoad(array $configs, ContainerBuilder $container)
+    private function adwordsLoad(array $config, ContainerBuilder $container): void
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('adwords.xml');
 
-        foreach ($configs as $config) {
-            if (isset($config['conversions'])) {
-                $container->setParameter('google.adwords.conversions', $config['conversions']);
-            }
-        }
+        $container->setParameter('google.adwords.conversions', $config['conversions']);
     }
 
-    /**
-     * @param array            $configs
-     * @param ContainerBuilder $container
-     */
-    private function analyticsLoad(array $configs, ContainerBuilder $container)
+    private function analyticsLoad(array $configs, ContainerBuilder $container): void
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('analytics.xml');
 
         $trackers = [];
         foreach ($configs as $config) {
-    		$trackers = array_merge($trackers, isset($config['trackers']) ? $config['trackers'] : []);
+            $trackers = array_merge($trackers, isset($config['trackers']) ? $config['trackers'] : []);
             if (isset($config['dashboard'])) {
                 $container->setParameter('google.analytics.dashboard', $config['dashboard']);
             }
@@ -80,14 +67,10 @@ class GoogleExtension extends Extension
                 $container->setParameter('google.analytics.js_source_endpoint', $config['js_source_endpoint']);
             }
         }
-		$container->setParameter('google.analytics.trackers', $trackers);
+        $container->setParameter('google.analytics.trackers', $trackers);
     }
 
-    /**
-     * @param array            $configs
-     * @param ContainerBuilder $container
-     */
-    private function mapsLoad(array $configs, ContainerBuilder $container)
+    private function mapsLoad(array $configs, ContainerBuilder $container): void
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('maps.xml');
@@ -99,10 +82,6 @@ class GoogleExtension extends Extension
         }
     }
 
-    /**
-     * @see Symfony\Component\DependencyInjection\Extension.ExtensionInterface::getAlias()
-     * @codeCoverageIgnore
-     */
     public function getAlias()
     {
         return 'google';

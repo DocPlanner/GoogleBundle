@@ -13,9 +13,9 @@ class Adwords
     private $container;
     private $conversions;
 
-    public function __construct(ContainerInterface $container, array $conversions = array())
+    public function __construct(ContainerInterface $container, array $conversions = [])
     {
-        $this->container = $container;
+        $this->container   = $container;
         $this->conversions = $conversions;
     }
 
@@ -27,7 +27,7 @@ class Adwords
         if (array_key_exists($key, $this->conversions)) {
             $this->container->get('session')->set(self::CONVERSION_KEY, $key);
         }
-    }    
+    }
 
     /**
      * @return Conversion $conversion
@@ -37,9 +37,17 @@ class Adwords
         if ($this->hasActiveConversion()) {
             $key = $this->container->get('session')->get(self::CONVERSION_KEY);
             $this->container->get('session')->remove(self::CONVERSION_KEY);
-            $config = $this->conversions[$key];
-            $this->activeConversion = new Conversion($config['id'], $config['label'], $config['value'], $config['format'], $config['color'], $config['language']);
+            $config                 = $this->conversions[$key];
+            $this->activeConversion = new Conversion(
+                $config['id'] ?? null,
+                $config['label'] ?? null,
+                $config['value'] ?? null,
+                $config['format'] ?? null,
+                $config['color'] ?? null,
+                $config['language'] ?? null
+            );
         }
+
         return $this->activeConversion;
     }
 
