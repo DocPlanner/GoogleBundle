@@ -53,14 +53,14 @@ jobs:
 
       - name: Install symfony/flex
         run: |
-          composer require --dev symfony/flex --no-progress --no-interaction --no-install --no-interaction
+          composer require --dev symfony/flex --no-progress --no-interaction --no-install --no-interaction --no-scripts
           rm composer.lock
 
       - name: Lock Symfony version in composer.json
-        run: composer config extra.symfony.require '${{ matrix.symfony }}' --no-interaction
+        run: composer config extra.symfony.require '${{ matrix.symfony }}' --no-interaction  --no-scripts
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-interaction
+        run: composer install --prefer-dist --no-progress --no-interaction --no-scripts
 
       - name: PHPUnit
         run: vendor/bin/phpunit
