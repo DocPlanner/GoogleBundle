@@ -22,10 +22,10 @@ class GoogleExtension extends Extension
             'maps'      => [],
         ];
 
-        foreach ($configs as $config) {
+        foreach ($configs as $singleConfig) {
             foreach (array_keys($modules) as $module) {
-                if (array_key_exists($module, $config)) {
-                    $modules[$module][] = isset($config[$module]) ? $config[$module] : [];
+                if (array_key_exists($module, $singleConfig)) {
+                    $modules[$module][] = isset($singleConfig[$module]) ? $singleConfig[$module] : [];
                 }
             }
         }
