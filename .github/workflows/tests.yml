@@ -49,6 +49,14 @@ jobs:
             'symfony/http-kernel: ${{ matrix.symfony }}' \
             'symfony/templating: ${{ matrix.symfony }}' \
             'symfony/http-foundation: ${{ matrix.symfony }}'
+          
+          composer require --ansi --no-scripts --update-with-all-dependencies --no-install --dev \
+            'symfony/framework-bundle: ${{ matrix.symfony }}' \
+            'symfony/yaml: ${{ matrix.symfony }}' \
+            'symfony/twig-bundle: ${{ matrix.symfony }}' \
+            'symfony/twig-bridge: ${{ matrix.symfony }}' \
+            'symfony/browser-kit: ${{ matrix.symfony }}'
+          
           rm composer.lock
 
       - name: Install dependencies
