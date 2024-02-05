@@ -41,18 +41,26 @@ jobs:
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
 
-      - name: Install symfony/flex
+      - name: Lock packages according to dependency matrix
         run: |
-          composer require --dev symfony/flex --ansi --no-progress --no-interaction --no-install --no-interaction --no-scripts
+          composer require --ansi --no-scripts --update-with-all-dependencies --no-install \
+            'symfony/config: ${{ matrix.symfony }}' \
+            'symfony/dependency-injection: ${{ matrix.symfony }}' \
+            'symfony/http-kernel: ${{ matrix.symfony }}' \
+            'symfony/templating: ${{ matrix.symfony }}' \
+            'symfony/http-foundation: ${{ matrix.symfony }}'
+          
+          composer require --ansi --no-scripts --update-with-all-dependencies --no-install --dev \
+            'symfony/framework-bundle: ${{ matrix.symfony }}' \
+            'symfony/yaml: ${{ matrix.symfony }}' \
+            'symfony/twig-bundle: ${{ matrix.symfony }}' \
+            'symfony/twig-bridge: ${{ matrix.symfony }}' \
+            'symfony/browser-kit: ${{ matrix.symfony }}'
+          
           rm composer.lock
 
-      - name: Lock Symfony version in composer.json
-        run: composer config extra.symfony.require '${{ matrix.symfony }}' --ansi --no-interaction  --no-scripts
-
       - name: Install dependencies
-        run: |
-          set -eo pipefail
-          composer install --ansi --prefer-dist --no-interaction --no-scripts
+        run: composer install --ansi --prefer-dist --no-interaction --no-scripts
 
       - name: PHPUnit
         run: vendor/bin/phpunit
